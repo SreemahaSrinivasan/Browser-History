@@ -1,3 +1,5 @@
+import {Component} from 'react'
+import HistoryItem from '../HistoryItem'
 import './index.css'
 
 const initialHistoryList = [
@@ -76,6 +78,80 @@ const initialHistoryList = [
 ]
 
 // Replace your code here
-const BrowserHistory = () => <div>Hello World</div>
+class BrowserHistory extends Component {
+  state = {searchInput: '', historyList: initialHistoryList, isEmpty: false}
+
+  onChangeSearchInput = event => {
+    this.setState({searchInput: event.target.value})
+  }
+
+  onDeleteHistoryItem = id => {
+    const {historyList} = this.state
+    const updatedHistoryList = historyList.filter(
+      eachHistory => eachHistory.id !== id,
+    )
+    if (updatedHistoryList.length === 0) {
+      this.setState({
+        historyList: updatedHistoryList,
+        isEmpty: true,
+      })
+    } else {
+      this.setState({historyList: updatedHistoryList})
+    }
+  }
+
+  render() {
+    const {searchInput, historyList} = this.state
+    let {isEmpty} = this.state
+    const filteredResults = historyList.filter(historyItem =>
+      historyItem.title.toLowerCase().includes(searchInput.toLowerCase()),
+    )
+    if (filteredResults.length === 0) {
+      isEmpty = true
+    }
+    return (
+      <div className="app-container">
+        <div className="search-container">
+          <img
+            src="https://assets.ccbp.in/frontend/react-js/history-website-logo-img.png"
+            alt="app logo"
+            className="history-image"
+          />
+          <div className="search-input-holder">
+            <img
+              src="https://assets.ccbp.in/frontend/react-js/search-img.png"
+              alt="search"
+              className="search-icon"
+            />
+            <input
+              type="search"
+              className="input-element"
+              value={searchInput}
+              onChange={this.onChangeSearchInput}
+            />
+          </div>
+        </div>
+        <div className="history-item-list">
+          {!isEmpty && (
+            <ul className="history-item">
+              {filteredResults.map(eachItem => (
+                <HistoryItem
+                  historyDetails={eachItem}
+                  key={eachItem.id}
+                  onDelete={this.onDeleteHistoryItem}
+                />
+              ))}
+            </ul>
+          )}
+          {isEmpty && (
+            <div className="empty-container">
+              <p className="empty-element">There is no history to show</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+}
 
 export default BrowserHistory
